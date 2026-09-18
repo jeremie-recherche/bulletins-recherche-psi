@@ -1,7 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 
-const { data } = Astro.props;
+const { data, editUrl } = Astro.props;
 const date = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
   .format(data.publishedAt)
   .replace(/^1 /, '1er ');
@@ -20,5 +20,9 @@ const date = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', y
       </dl>
     </header>
     <div class="prose"><slot /></div>
+    <footer class="article-actions">
+      <p>Vous avez repéré une erreur ou souhaitez préciser une formulation ?</p>
+      <a class="edit-button" href={editUrl} rel="nofollow">Modifier ce bulletin sur GitHub</a>
+    </footer>
   </article>
 </BaseLayout>
