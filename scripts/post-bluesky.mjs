@@ -35,6 +35,18 @@ function truncateGraphemes(value, maximum) {
   return `${graphemes.slice(0, maximum - 1).join('').trimEnd()}…`;
 }
 
+const S32_CHAR = '234567abcdefghijklmnopqrstuvwxyz';
+
+function s32encode(value) {
+  let encoded = '';
+  while (value) {
+    const character = value % 32;
+    value = Math.floor(value / 32);
+    encoded = S32_CHAR.charAt(character) + encoded;
+  }
+  return encoded;
+}
+
 const title = readField('title');
 const description = readField('description');
 const publishedAt = readField('publishedAt');
@@ -51,8 +63,11 @@ const postText = truncateGraphemes(
   `Nouveau bulletin de la recherche psi\n\n${title}\n\n${description}`,
   300,
 );
-const rkey = crypto.createHash('sha256').update(url).digest('hex').slice(0, 24);
 const createdAt = new Date(`${publishedAt}T08:00:00.000Z`).toISOString();
+const rkeyDigest = crypto.createHash('sha256').update(url).digest();
+const rkeyTimestamp = Date.parse(createdAt) * 1000 + (rkeyDigest.readUInt16BE(0) % 1000);
+const rkeyClock = rkeyDigest[2] & 31;
+const rkey = `${s32encode(rkeyTimestamp)}${s32encode(rkeyClock).padStart(2, '2')}`;
 
 const record = {
   $type: 'app.bsky.feed.post',
