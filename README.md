@@ -8,6 +8,9 @@ Site de veille critique consacré à la parapsychologie, à l'anomalistique et a
 2. Créer une branche et une pull request afin de relire le texte et de vérifier automatiquement la construction.
 3. Passer `draft` à `false` après validation de fond.
 4. Fusionner la pull request. GitHub Actions publie alors le site sur GitHub Pages.
+5. Après le déploiement, GitHub Actions annonce automatiquement le nouveau bulletin sur Bluesky. Une correction ultérieure d'un bulletin déjà public ne crée pas une nouvelle annonce.
+
+Le flux peut aussi être exécuté manuellement en mode essai depuis l'onglet Actions, sans publication sur Bluesky.
 
 ## Développement local
 
