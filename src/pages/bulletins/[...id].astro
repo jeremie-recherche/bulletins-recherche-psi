@@ -9,7 +9,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
-const editUrl = `https://github.com/jeremie-recherche/bulletins-recherche-psi/edit/main/src/content/bulletins/${post.id}.md`;
+const editUrl = `https://github.com/recherche-psi/bulletins-recherche-psi/edit/main/src/content/bulletins/${post.id}.md`;
 ---
 
 <BulletinLayout data={post.data} editUrl={editUrl} headings={headings}><Content /></BulletinLayout>
