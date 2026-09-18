@@ -1,0 +1,101 @@
+name: Diffuser les nouveaux bulletins sur Mastodon
+
+on:
+  workflow_run:
+    workflows: ["Déployer le site"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      bulletin_path:
+        description: Chemin du bulletin
+        required: true
+        default: src/content/bulletins/2026-09-18-preenregistrement-recherche-psi.md
+        type: string
+      mode:
+        description: Action à effectuer
+        required: true
+        default: test
+        type: choice
+        options:
+          - test
+          - preview
+          - publish
+
+permissions:
+  contents: read
+
+jobs:
+  diffuser:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    env:
+      MASTODON_BASE_URL: ${{ vars.MASTODON_BASE_URL }}
+      MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 2
+
+      - name: Déterminer les bulletins à annoncer
+        id: bulletins
+        shell: bash
+        env:
+          MANUAL_PATH: ${{ inputs.bulletin_path }}
+          MANUAL_MODE: ${{ inputs.mode }}
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "$MANUAL_MODE" == "test" ]]; then
+              files=""
+            else
+              files="$MANUAL_PATH"
+            fi
+          else
+            files=""
+            while IFS= read -r file; do
+              [[ -z "$file" ]] && continue
+              if ! grep -Eq '^draft:[[:space:]]*false[[:space:]]*$' "$file"; then
+                continue
+              fi
+              if git cat-file -e "HEAD^:$file" 2>/dev/null && \
+                 git show "HEAD^:$file" | grep -Eq '^draft:[[:space:]]*false[[:space:]]*$'; then
+                continue
+              fi
+              files+="${files:+$'\n'}$file"
+            done < <(git diff --diff-filter=AM --name-only HEAD^ HEAD -- src/content/bulletins/ | grep -E '\.mdx?$' || true)
+          fi
+
+          {
+            echo 'files<<EOF'
+            echo "$files"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Préparer ou publier les annonces
+        if: steps.bulletins.outputs.files != ''
+        shell: bash
+        env:
+          FILES: ${{ steps.bulletins.outputs.files }}
+          MANUAL_MODE: ${{ inputs.mode }}
+        run: |
+          publish=false
+          if [[ "${{ github.event_name }}" == "workflow_run" || "$MANUAL_MODE" == "publish" ]]; then
+            publish=true
+          fi
+
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+            if [[ "$publish" == "true" ]]; then
+              node scripts/post-mastodon.mjs "$file" --publish
+            else
+              node scripts/post-mastodon.mjs "$file"
+            fi
+          done <<< "$FILES"
+
+      - name: Vérifier la connexion sans publier
+        if: steps.bulletins.outputs.files == ''
+        run: node scripts/check-mastodon.mjs
