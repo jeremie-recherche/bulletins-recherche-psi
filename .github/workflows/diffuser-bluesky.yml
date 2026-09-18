@@ -87,6 +87,6 @@ jobs:
             fi
           done <<< "$FILES"
 
-      - name: Aucun nouveau bulletin
+      - name: Vérifier la connexion sans publier
         if: steps.bulletins.outputs.files == ''
-        run: echo "Aucun bulletin nouvellement publié dans cette révision."
+        run: node scripts/check-bluesky.mjs
