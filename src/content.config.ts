@@ -12,7 +12,7 @@ const bulletins = defineCollection({
     reading: z.string(),
     authors: z.string(),
     publication: z.string(),
-    doi: z.url(),
+    doi: z.url().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
   }),

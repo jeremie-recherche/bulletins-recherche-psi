@@ -2,7 +2,9 @@
 import BaseLayout from './BaseLayout.astro';
 
 const { data } = Astro.props;
-const date = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(data.publishedAt);
+const date = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  .format(data.publishedAt)
+  .replace(/^1 /, '1er ');
 ---
 
 <BaseLayout title={data.title} description={data.description}>
