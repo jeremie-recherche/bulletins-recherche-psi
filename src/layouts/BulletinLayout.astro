@@ -1,10 +1,18 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 
-const { data, editUrl } = Astro.props;
+const { data, editUrl, headings = [] } = Astro.props;
 const date = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
   .format(data.publishedAt)
   .replace(/^1 /, '1er ');
+const tocSections: Array<{ slug: string; text: string; children: Array<{ slug: string; text: string }> }> = [];
+for (const heading of headings) {
+  if (heading.depth === 2) {
+    tocSections.push({ slug: heading.slug, text: heading.text, children: [] });
+  } else if (heading.depth === 3 && tocSections.length > 0) {
+    tocSections[tocSections.length - 1].children.push({ slug: heading.slug, text: heading.text });
+  }
+}
 ---
 
 <BaseLayout title={data.title} description={data.description}>
@@ -19,6 +27,24 @@ const date = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', y
         <div><dt>Publication</dt><dd>{data.publication}</dd></div>
       </dl>
     </header>
+    {tocSections.length > 1 && (
+      <nav class="toc" aria-labelledby="sommaire-titre">
+        <p class="toc-label">Plan du bulletin</p>
+        <h2 id="sommaire-titre">Sommaire</h2>
+        <ol>
+          {tocSections.map((section) => (
+            <li>
+              <a href={`#${section.slug}`}>{section.text}</a>
+              {section.children.length > 0 && (
+                <ul>
+                  {section.children.map((child) => <li><a href={`#${child.slug}`}>{child.text}</a></li>)}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
     <div class="prose"><slot /></div>
     <footer class="article-actions">
       <p>Vous avez repéré une erreur ou souhaitez préciser une formulation ?</p>

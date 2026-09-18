@@ -63,6 +63,14 @@ h1,h2,h3 { font-family:'Source Serif 4',serif; line-height:1.08; letter-spacing:
 .metadata div { border-top:1px solid var(--line); padding-top:.7rem; }
 .metadata dt { color:var(--teal); font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
 .metadata dd { margin:.3rem 0 0; font-size:.86rem; }
+.toc { margin:2.5rem 0 .5rem; padding:1.6rem 1.8rem; border:1px solid var(--line); background:var(--white); }
+.toc-label { margin:0 0 .25rem; color:var(--teal); font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.toc h2 { margin:0 0 1rem; font-size:1.7rem; font-weight:500; }
+.toc ol { margin:0; padding-left:1.35rem; columns:2; column-gap:3rem; }
+.toc ol > li { break-inside:avoid; margin:0 0 .55rem; padding-left:.2rem; }
+.toc ul { margin:.35rem 0 .7rem; padding-left:1.1rem; list-style:disc; color:var(--muted); font-size:.82rem; }
+.toc a { text-decoration:none; }
+.toc a:hover { color:var(--teal); text-decoration:underline; }
 .prose { padding-top:2.5rem; font-family:'Source Serif 4',serif; font-size:1.12rem; }
 .prose h2 { margin:3.2rem 0 1rem; font-size:2.2rem; font-weight:600; }
 .prose h3 { margin-top:2.5rem; font-size:1.5rem; }
@@ -89,6 +97,8 @@ h1,h2,h3 { font-family:'Source Serif 4',serif; line-height:1.08; letter-spacing:
   .hero-grid,.editorial-grid { grid-template-columns:1fr; gap:3rem; }
   .feature-card { grid-template-columns:1fr; gap:1rem; }
   .metadata { grid-template-columns:1fr; }
+  .toc { padding:1.25rem; }
+  .toc ol { columns:1; }
   .article-actions { align-items:flex-start; flex-direction:column; }
   .footer-inner { display:block; }
   .footer-inner p + p { margin-top:1.5rem; }
