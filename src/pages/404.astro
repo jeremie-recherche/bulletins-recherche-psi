@@ -1,0 +1,5 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const base = import.meta.env.BASE_URL;
+---
+<BaseLayout title="Page introuvable"><section class="page-head shell-narrow"><p class="eyebrow">Erreur 404</p><h1>Cette page n'existe pas.</h1><p><a class="button" href={base}>Revenir à l'accueil</a></p></section></BaseLayout>

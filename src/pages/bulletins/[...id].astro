@@ -1,0 +1,14 @@
+---
+import { getCollection, render } from 'astro:content';
+import BulletinLayout from '../../layouts/BulletinLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('bulletins', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BulletinLayout data={post.data}><Content /></BulletinLayout>
